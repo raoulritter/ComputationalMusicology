@@ -1,30 +1,65 @@
 ---
-title: "KanyesGrief.Rmd"
-author: "Raoul Ritter"
-date: "2/19/2022"
-output: html_document
+title: "Raoul Ritter"
+date: "25/3/2022"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    theme: 
+      version: 4
+      bootswatch: minty
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-
+```{r setup}
+library(tidyverse)
+library(tidymodels)
+library(plotly)
+library(protoclust)
+library(spotifyr)
+library(compmus)
+library(flexdashboard)
+library(tidyverse)
+library(ggdendro)
 TLOP <- get_playlist_audio_features("","6xMmY2bJcoRfTYnbaswB81")
+DONDA <- get_playlist_audio_features("","6CBjIOCvkEnNom6zr2CzZt")
+JIK <- get_playlist_audio_features("","3Zea55ELBEcnURbXY1uH3P")
+MBDTF <- get_playlist_audio_features("","38LsK6yyXI0apx7n7bbx8i")
+YEEZUS <- get_playlist_audio_features("","753uZalNXz3Lv6FreyTWiF")
+HEARTBREAKS <- get_playlist_audio_features("","3nH7CBa7ohrAU9k2t7aMgM")
+YE <- get_playlist_audio_features("","3ttuqnv3RBZ2tT6Fommpyf")
+ALL <- rbind(TLOP,DONDA,JIK,MBDTF,YEEZUS,HEARTBREAKS,YE)
+```
+### Introduction
 
-## Including Plots
+For my corpus I will be looking at the 7 (solo) studio albums by Kanye West that he created after the death of his mother. Online there is often a theory that these albums correspond with the stages of grief. During this assignment I would like to check if these albums indeed follow this pattern.
 
-You can also embed plots, for example:
+1. Shock (808’s and Heartbreak)
+2. Denial (My Beautiful Dark Twisted Fantasy)
+3. Anger (Yeezus)
+4. Bargaining (The Life of Pablo or TLOP)
+5. Depression (Ye)
+6. Testing (JESUS IS KING)
+7. Acceptance (DONDA)
+I would like to do this analysis by taking a look at the information that the spotify API provides such as valence, tempo and speechiness in order to analyse if these albums indeed could be catagorized as having differentes that could be recognized as corresponding to the stages of grief.
 
-```{r pressure, echo=FALSE}
+I think the corpus has a large variety as the albums while listening give off a very different feeling.
+
+Some songs that stand out in this corpus are Power from the album Denial which comes from the album My Beautiful Dark Twisted Fantasy. Which comes off as quite a angry song aswell. Issues could also stem from the fact that Ye has conststently made changes to his albums. One example of this is for TLOP in which he changed multiple segments in songs aswell as completely adding a new song Saint Pablo to the album. However the issue is that spotify only has the most recent version of his album. Therefore it is difficult to recognize if the changes he has made on a single album also reflect the changes in his process. But.
+
+### Global Overview of All Albums
+
+```{r happy}
+ALL %>% 
+ggplot(aes(x = valence, y = energy, color = playlist_name)) +
+  geom_jitter() +
+  geom_vline(xintercept = 0.5) +
+  geom_hline(yintercept = 0.5) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  annotate('text', 0.25 / 2, 0.95, label = "Turbulent/Angry", fontface = "bold") +
+  annotate('text', 1.75 / 2, 0.95, label = "Happy/Joyful", fontface = "bold") +
+  annotate('text', 1.75 / 2, 0.05, label = "Chill/Peaceful", fontface = "bold") +
+  annotate('text', 0.25 / 2, 0.05, label = "Sad/Depressing", fontface = "bold")
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
