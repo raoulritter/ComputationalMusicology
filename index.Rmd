@@ -46,7 +46,7 @@ Some songs that stand out in this corpus are Power from the album Denial which c
 
 ### Global Overview of All Albums
 
-```{r happy}
+```{r fig.height = 10, fig.width = 12}
 ALL %>% 
 ggplot(aes(x = valence, y = energy, color = playlist_name)) +
   geom_jitter() +
