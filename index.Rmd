@@ -18,13 +18,14 @@ library(compmus)
 library(flexdashboard)
 library(tidyverse)
 library(ggdendro)
+library(kknn)
 TLOP <- get_playlist_audio_features("","6xMmY2bJcoRfTYnbaswB81")
 DONDA <- get_playlist_audio_features("","6CBjIOCvkEnNom6zr2CzZt")
+YE <- get_playlist_audio_features("","3ttuqnv3RBZ2tT6Fommpyf")
 JIK <- get_playlist_audio_features("","3Zea55ELBEcnURbXY1uH3P")
 MBDTF <- get_playlist_audio_features("","38LsK6yyXI0apx7n7bbx8i")
 YEEZUS <- get_playlist_audio_features("","753uZalNXz3Lv6FreyTWiF")
 HEARTBREAKS <- get_playlist_audio_features("","3nH7CBa7ohrAU9k2t7aMgM")
-YE <- get_playlist_audio_features("","3ttuqnv3RBZ2tT6Fommpyf")
 ALL <- rbind(TLOP,DONDA,JIK,MBDTF,YEEZUS,HEARTBREAKS,YE)
 ```
 ### Introduction
@@ -93,7 +94,83 @@ Section 6
 
 Section 7
 
-### Section 8
+### Section 12
 
-The final section
+```{r classification}
+
+TLOP <- get_playlist_audio_features("","6xMmY2bJcoRfTYnbaswB81")
+DONDA <- get_playlist_audio_features("","6CBjIOCvkEnNom6zr2CzZt")
+YE <- get_playlist_audio_features("","3ttuqnv3RBZ2tT6Fommpyf")
+
+pop <- 
+    get_playlist_audio_features('spotify', '6xMmY2bJcoRfTYnbaswB81') %>% 
+    add_audio_analysis
+party <- 
+    get_playlist_audio_features('spotify', '6CBjIOCvkEnNom6zr2CzZt') %>% 
+    add_audio_analysis
+workout <- 
+    get_playlist_audio_features('spotify', '3ttuqnv3RBZ2tT6Fommpyf') %>% 
+    add_audio_analysis
+indie <- 
+    pop %>% mutate(playlist = "TLOP") %>% 
+    bind_rows(
+        party %>% mutate(playlist = "Donda"),
+        workout %>% mutate(playlist = "Ye")) %>% 
+    mutate(playlist = factor(playlist)) %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(cols = c(pitches, timbre))
+indie_juice <- 
+    recipe(playlist ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = indie) %>% 
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    # step_range(all_predictors()) %>% 
+    prep(indie) %>% 
+    juice
+indie_cv <- indie_juice %>% vfold_cv(10)
+indie_knn <- 
+  nearest_neighbor(mode = 'classification', neighbors = 1) %>% 
+  set_engine('kknn')
+predict_knn_reduced <- function(split) {
+    fit(
+        indie_knn, 
+        playlist ~ c01 + liveness + acousticness + c02 + energy, 
+        data = analysis(split)) %>% 
+    predict(assessment(split), type = 'class') %>%
+    bind_cols(assessment(split))
+}
+indie_cv %>% 
+    mutate(pred = map(splits, predict_knn_reduced)) %>% unnest(pred) %>% 
+    conf_mat(truth = playlist, estimate = .pred_class) %>% 
+    autoplot(type = 'mosaic')
+```
 
