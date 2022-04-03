@@ -76,7 +76,7 @@ The interesting thing we see at first glance is that there is quite an even dist
 
 <iframe src="https://open.spotify.com/embed/playlist/2benrUkgKv28fkKoBowcFU?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
 
-### Section 2 
+### Analysis of Given methods
 
 Section 2
 
@@ -160,9 +160,61 @@ hurricane %>%
 
 Section 3
 
+```{r}
+ALL <-
+  TLOP %>%
+  mutate(country = "TLOP") %>%
+  bind_rows(DONDA %>% mutate(country = "DONDA")) %>%
+  bind_rows(YE %>% mutate(country = "Ye")) %>%
+  bind_rows(JIK %>% mutate(country = "Jesus is King")) %>%
+  bind_rows(MBDTF %>% mutate(country = "My beautiful dark twisted fantasy")) %>%
+  bind_rows(YEEZUS %>% mutate(country = "Yeezus")) %>%
+  bind_rows(HEARTBREAKS %>% mutate(country = "808's and Heartbreaks")) %>%
+  mutate(
+    country = fct_relevel(country, "TLOP", "Donda", "Ye", "Jesus is King", "My beautiful dark twisted fantasy", "Yeezus","808's and Heartbreaks")
+  )
 
+february_dip <-
+  ALL %>%
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  facet_wrap(~country) +           # Separate charts per country.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_dark() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
 
+ggplotly(february_dip)
 
+```
 ### Section 4
 
 Section 4
