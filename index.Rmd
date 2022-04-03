@@ -4,6 +4,7 @@ date: "Raoul Ritter"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
+    self_contained: false
     theme: 
       version: 4
       bootswatch: minty
@@ -39,11 +40,12 @@ For my corpus I will be looking at the 7 (solo) studio albums by Kanye West that
 5. Depression (Ye)
 6. Testing (JESUS IS KING)
 7. Acceptance (DONDA)
-I would like to do this analysis by taking a look at the information that the spotify API provides such as valence, tempo and speechiness in order to analyse if these albums indeed could be catagorized as having differentes that could be recognized as corresponding to the stages of grief.
 
-I think the corpus has a large variety as the albums while listening give off a very different feeling.
+In this project I will be analyzing these albums using the information that the spotify API provides such as valence, tempo and speechiness. These variables will be used to analyse if these albums can be categorized as having unique features that correspond to the stages of grief.
 
-Some songs that stand out in this corpus are Power from the album Denial which comes from the album My Beautiful Dark Twisted Fantasy. Which comes off as quite a angry song aswell. Issues could also stem from the fact that Ye has conststently made changes to his albums. One example of this is for TLOP in which he changed multiple segments in songs aswell as completely adding a new song Saint Pablo to the album. However the issue is that spotify only has the most recent version of his album. Therefore it is difficult to recognize if the changes he has made on a single album also reflect the changes in his process. But.
+The corpus consists of exactly 100 songs. Which knowing Ye is not an accident. The corpus has a large variety of songs and feelings across the different albums. The difficulty in this corpus is if the albums are truly unique or if the diversity of features in songs per album are too large to distinguish.  
+
+Some songs that stand out in this corpus are Power from the album Denial which comes from the album My Beautiful Dark Twisted Fantasy. Which comes off as quite a angry song as well. Issues could also stem from the fact that Ye has consistently made changes to his albums. One example of this is for TLOP in which he changed multiple segments in songs as well as completely adding a new song Saint Pablo to the album. However the issue is that spotify only has the most recent version of his album. Therefore it is difficult to recognize if the changes he has made on a single album also reflect the changes in his process.
 
 ### Global Overview of All Albums
 
@@ -61,6 +63,18 @@ ggplot(aes(x = valence, y = energy, color = playlist_name)) +
   annotate('text', 0.25 / 2, 0.05, label = "Sad/Depressing", fontface = "bold")
 
 ```
+
+***
+
+This graph gives a global analysis of the overall atmosphere of the music of the 7 Studio Albums that Kanye West released after his mothers death. 
+
+According to the Spotify API, **Energy** is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy.
+
+**Valence** is a measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+
+The interesting thing we see at first glance is that there is quite an even distribution between the different albums. They are not specifically as select into their specific segments as we might have thought. However on closer inspection you can see that there are clear differences between certain albums. For example Yeezus which we would associate with anger has most of it's song in the Turbulent/Angry section. Similar case for MBDTF. However Donda has a very diverse spectrum being in three different segments and not having real clustering. However it could also be that due to the style of Kanye West's music largely being Hip Hop these songs are often seen as being in the Angry due to being higher in energy and lower in valance resulting in this clustering. 
+
+<iframe src="https://open.spotify.com/embed/playlist/2benrUkgKv28fkKoBowcFU?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
 
 ### Section 2 
 
