@@ -85,7 +85,7 @@ The interesting thing we see at first glance is that there is quite an even dist
 ### The Differences in Valance and Energy over Time
 
 
-```{r fig.height = 15, fig.width = 15}
+```{r Differences}
 ALL <-
   TLOP %>%
   mutate(country = "TLOP") %>%
