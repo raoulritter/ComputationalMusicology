@@ -20,6 +20,9 @@ library(flexdashboard)
 library(tidyverse)
 library(ggdendro)
 library(kknn)
+library(ggheatmap)
+library(protoclust)
+
 TLOP <- get_playlist_audio_features("","6xMmY2bJcoRfTYnbaswB81")
 DONDA <- get_playlist_audio_features("","6CBjIOCvkEnNom6zr2CzZt")
 YE <- get_playlist_audio_features("","3ttuqnv3RBZ2tT6Fommpyf")
@@ -76,7 +79,73 @@ The interesting thing we see at first glance is that there is quite an even dist
 
 <iframe src="https://open.spotify.com/embed/playlist/2benrUkgKv28fkKoBowcFU?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
 
-### Analysis of Given methods
+
+
+
+### The Differences in Valance and Energy over Time
+
+
+```{r fig.height = 15, fig.width = 15}
+ALL <-
+  TLOP %>%
+  mutate(country = "TLOP") %>%
+  bind_rows(DONDA %>% mutate(country = "DONDA")) %>%
+  bind_rows(YE %>% mutate(country = "Ye")) %>%
+  bind_rows(JIK %>% mutate(country = "Jesus is King")) %>%
+  bind_rows(MBDTF %>% mutate(country = "My beautiful dark twisted fantasy")) %>%
+  bind_rows(YEEZUS %>% mutate(country = "Yeezus")) %>%
+  bind_rows(HEARTBREAKS %>% mutate(country = "808's and Heartbreaks")) %>%
+  mutate(
+    country = fct_relevel(country, "TLOP", "Donda", "Ye", "Jesus is King", "My beautiful dark twisted fantasy", "Yeezus","808's and Heartbreaks")
+  )
+
+difference_albums <-
+  ALL %>%
+  ggplot(                          # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = track.popularity,
+      colour = danceability,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  facet_wrap(~country) +           # Separate charts per country.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
+    minor_breaks = NULL            # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_dark() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Valence",
+    y = "Energy"
+  )
+
+ggplotly(difference_albums)
+
+```
+***
+When we take a look at the individual albums more clearly it becomes clear that there are distinct differences but it is quite difficult to digest from this information if this is indeed caused by the stages of grief or if these are more based on the individual tracks and semantics in each. The Albums all cover a large variety of the spectrum. However we do see clear examples of the Album Ye where the Valance of most songs is much lower then an album such as TLOP which we would associate with bargaining and having a large spectrum of different energies and valances. Therefore the hypothesis about the different stages of grief appear to have some truth in the fact that we see differences between different albums which correspond to differences in energy and valance. 
+
+
+
+### Self-Similarity
 
 
 ```{r Pitches}
@@ -336,90 +405,69 @@ FSMH1 %>%
 ```
 
 
-### The Differences in Valance and Energy over Time
+***
+For this visualization I wanted to see if there was a formula for what creates a hit Kanye west song. Here the Self Similarity matrix are plotted for each of the most popular song per album. We see that there are quite some differences in these visualisations. 
 
 
+In a self-similarity matrix, yellow shows variance and more blue shows similarity. These self similarity matrices focus on 1) timbre and on 2) pitches. According to the [Spotify API](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-analysis). The first is **timbre** . The second self similarity matrix is  **pitch**. What we see is that for specific songs there are very high numbers of self similarity due to all songs having large blocks with one exception. This song being All mine. This is also something that corresponds with the song. There are many unexpected parts and it is not a song that has the same sentiment throughout it. This also fits with our hypothesis of this album being associated with a more depressed segment of his grieving process. 
 
-```{r fig.height = 15, fig.width = 15}
-ALL <-
-  TLOP %>%
-  mutate(country = "TLOP") %>%
-  bind_rows(DONDA %>% mutate(country = "DONDA")) %>%
-  bind_rows(YE %>% mutate(country = "Ye")) %>%
-  bind_rows(JIK %>% mutate(country = "Jesus is King")) %>%
-  bind_rows(MBDTF %>% mutate(country = "My beautiful dark twisted fantasy")) %>%
-  bind_rows(YEEZUS %>% mutate(country = "Yeezus")) %>%
-  bind_rows(HEARTBREAKS %>% mutate(country = "808's and Heartbreaks")) %>%
-  mutate(
-    country = fct_relevel(country, "TLOP", "Donda", "Ye", "Jesus is King", "My beautiful dark twisted fantasy", "Yeezus","808's and Heartbreaks")
-  )
 
-difference_albums <-
-  ALL %>%
-  ggplot(                          # Set up the plot.
-    aes(
-      x = valence,
-      y = energy,
-      size = track.popularity,
-      colour = danceability,
-      label = track.name           # Labels will be interactively visible.
-    )
-  ) +
-  geom_point() +                   # Scatter plot.
-  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
-  facet_wrap(~country) +           # Separate charts per country.
-  scale_x_continuous(              # Fine-tune the x axis.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),        # Use grid-lines for quadrants only.
-    minor_breaks = NULL            # Remove 'minor' grid-lines.
-  ) +
-  scale_y_continuous(              # Fine-tune the y axis in the same way.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),
-    minor_breaks = NULL
-  ) +
-  scale_colour_viridis_c(          # Use the cividis palette
-    option = "E",                  # Qualitative set.
-    alpha = 0.8,                   # Include some transparency
-    guide = "none"
-  ) +
-  scale_size_continuous(           # Fine-tune the sizes of each point.
-    guide = "none"                 # Remove the legend for size.
-  ) +
-  theme_dark() +                  # Use a simpler theme.
-  labs(                            # Make the titles nice.
-    x = "Valence",
-    y = "Energy"
-  )
+### What makes a hit Kanye west song
 
-ggplotly(difference_albums)
 
+```{r hits}
+hits <- 
+    get_playlist_audio_features('Kanye Hits', '1y8HgLaiz4E3Vh52WyErei') %>% 
+    add_audio_analysis %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(cols = c(pitches, timbre))
+hit_juice <- 
+    recipe(track.name ~
+               danceability +
+               energy +
+               loudness +
+               speechiness +
+               acousticness +
+               instrumentalness +
+               liveness +
+               valence +
+               tempo +
+               duration +
+               C + `C#|Db` + D + `D#|Eb` +
+               E + `F` + `F#|Gb` + G +
+               `G#|Ab` + A + `A#|Bb` + B +
+               c01 + c02 + c03 + c04 + c05 + c06 +
+               c07 + c08 + c09 + c10 + c11 + c12,
+           data = hits) %>% 
+    step_range(all_predictors()) %>% 
+    prep(hits %>% mutate(track.name = str_trunc(track.name, 20))) %>% 
+    juice %>% 
+    column_to_rownames('track.name')
+ggheatmap(
+    hit_juice,
+    hclustfun = protoclust,
+    dist_method = 'manhattan'
+)
 ```
 ***
-When we take a look at the individual albums more clearly it becomes clear that there are distinct differences but it is quite difficult to digest from this information if this is indeed caused by the stages of grief or if these are more based on the individual tracks and semantics in each. The Albums all cover a large variety of the spectrum. However we do see clear examples of the Album Ye where the Valance of most songs is much lower then an album such as TLOP which we would associate with bargaining and having a large spectrum of different energies and valances. Therefore the hypothesis about the different stages of grief appear to have some truth in the fact that we see differences between different albums which correspond to differences in energy and valance. 
+The deprogram and heat map in this segment breaks down the different hits per Album. 
 
 
-
-
-### Section 4
-
-Section 4
-
-
-### Section 5
-
-Section 5
-
-
-### Section 6
-
-Section 6
-
-### Section 7
-
-Section 7
-
-### Section 12
+### Classifying the albums 
 
 ```{r classification}
 
@@ -499,3 +547,18 @@ indie_cv %>%
     autoplot(type = 'mosaic')
 ```
 
+The mosaic at the left shows the performance of a classifier trying to distinguish the three most recent studio albums: TLOP, Ye, and Donda. Using a random-forest classifier, the most important features for classifying tracks among these playlists are:
+
+Timbre Component 1 (loudness),
+Timbre Component 2 (brightness),
+liveness,
+acousticness, and
+energy.
+
+
+###Conclusion
+
+During this assignment I found that I had a very interesting corpus. However the larger struggle I had aswell as many of my students is simply that the Spotify API is not powerful enough to truly capture the sentiment that specific songs have. This is something that the human ear is very good at as a form of musicial information retrieval. As we as humans are able to digest lyrical meaning and acoustics at the same time. This is a feature that the Spotify API lacks. Therefore it would be very interesting to see if different techniques would be better suited to grasp the sentiment of Kanye West's songs. This could be done by looking at the lyrics from all the songs he has produced since his mothers death and looking at their sentiment and what mood comes from this sentiment analysis. That way we would be better be able to tell if the popular fan theory of the albums corresponding with the stages of grief can truly be measured.  
+
+
+<iframe src="https://open.spotify.com/embed/playlist/2benrUkgKv28fkKoBowcFU?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
