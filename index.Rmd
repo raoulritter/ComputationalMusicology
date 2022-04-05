@@ -155,9 +155,6 @@ hurricane %>%
 
 ### The Differences in Valance and Energy over Time
 
-***
-When we take a look at the individual albums more clearly it becomes clear that there are distinct differences but it is quite difficult to digest from this information if this is indeed caused by the stages of grief or if these are more based on the individual tracks and semantics in each. The Albums all cover a large variety of the spectrum. However we do see clear examples of the Album Ye where the Valance of most songs is much lower then an album such as TLOP which we would associate with bargaining and having a large spectrum of different energies and valances. Therefore the hypothesis about the different stages of grief appear to have some truth in the fact that we see differences between different albums which correspond to differences in energy and valance. 
-
 
 
 ```{r fig.height = 15, fig.width = 15}
@@ -215,6 +212,12 @@ difference_albums <-
 ggplotly(difference_albums)
 
 ```
+***
+When we take a look at the individual albums more clearly it becomes clear that there are distinct differences but it is quite difficult to digest from this information if this is indeed caused by the stages of grief or if these are more based on the individual tracks and semantics in each. The Albums all cover a large variety of the spectrum. However we do see clear examples of the Album Ye where the Valance of most songs is much lower then an album such as TLOP which we would associate with bargaining and having a large spectrum of different energies and valances. Therefore the hypothesis about the different stages of grief appear to have some truth in the fact that we see differences between different albums which correspond to differences in energy and valance. 
+
+
+
+
 ### Section 4
 
 Section 4
