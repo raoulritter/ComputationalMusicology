@@ -556,9 +556,8 @@ liveness,
 acousticness, and
 energy.
 
-###Conclusion
 
-***
+**Conclusion**
 During this assignment I found that I had a very interesting corpus. However the larger struggle I had aswell as many of my students is simply that the Spotify API is not powerful enough to truly capture the sentiment that specific songs have. This is something that the human ear is very good at as a form of musicial information retrieval. As we as humans are able to digest lyrical meaning and acoustics at the same time. This is a feature that the Spotify API lacks. Therefore it would be very interesting to see if different techniques would be better suited to grasp the sentiment of Kanye West's songs. This could be done by looking at the lyrics from all the songs he has produced since his mothers death and looking at their sentiment and what mood comes from this sentiment analysis. That way we would be better be able to tell if the popular fan theory of the albums corresponding with the stages of grief can truly be measured.  
 
 
